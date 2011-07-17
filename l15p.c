@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "read.h"
+#include "eval.h"
 #include "print.h"
 
 void output_splash() {
@@ -11,7 +12,7 @@ void output_splash() {
 
 void repl() {
     printf( "\n>>> " );
-    print( read( stdin ) );
+    print( eval( read( stdin ) ) );
     repl();
 }
 

@@ -3,21 +3,24 @@ CFLAGS=-Wall
 CF=$(CC) $(CFLAGS)
 CO=$(CF) -c
 TARGET=l15p
-OBJS= $(TARGET).o print.o read.o
+OBJS=l15p.o read.o print.o eval.o
 
 cleanbuild: clean all
 
 all: $(OBJS)
 	$(CF) $(OBJS) -o $(TARGET)
 
-$(TARGET).o:
-	$(CO) $(TARGET).c
+l15p.o:
+	$(CO) l15p.c
+
+read.o:
+	$(CO) read.c
 
 print.o:
 	$(CO) print.c
 
-read.o:
-	$(CO) read.c
+eval.o:
+	$(CO) eval.c
 
 clean:
 	rm -rf $(OBJS) $(TARGET)

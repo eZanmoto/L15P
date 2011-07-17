@@ -1,8 +1,25 @@
 (L15P
   (Contents
-    (Introduction))
+    (Introduction)
+    (Running))
 
   (Introduction
-    (What is L15P
+    (What is L15P?
       (My attempt at implementing LISP as close as possible to the original
-        specification.))))
+        specification.)))
+
+  (Running
+    (Installation
+      (To install, run:
+
+        make && make install
+        
+       which will build the source and install the executable in the standard
+       directory.)
+
+    (Running)
+      (To run, use:
+
+        l15p
+        
+       To exit, use ctrl+C.))))
