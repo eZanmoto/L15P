@@ -4,8 +4,6 @@
 #include <ctype.h>
 #include "read.h"
 
-#define ppp(x) printf( "*** %s\n", x )
-
 void error( char *message ) {
     fprintf( stderr, "[!] %s\n", message );
     exit( 1 );
@@ -39,13 +37,13 @@ bool in_chars( char c, char *cs ) {
 }
 
 bool is_white( int c ) {
-    // return ' ' == c || '\t' == c || '\n' == c || EOF == c;
-    return in_chars( c, " \t\n" );
+    return ' ' == c || '\t' == c || '\n' == c || EOF == c;
+    // return in_chars( c, " \t\n\0" );
 }
 
 bool is_delim( int c ) {
-    // return '(' == c || ')' == c;
-    return in_chars( c, "()" );
+    return '(' == c || ')' == c;
+    // return in_chars( c, "()\0" );
 }
 
 bool is_symbolic( int c ) {
@@ -54,7 +52,6 @@ bool is_symbolic( int c ) {
 
 void eat_whitespace( FILE *in ) {
     int c;
-
     do {
         c = getc( in );
     } while( c != EOF && is_white( c ) );
@@ -72,18 +69,10 @@ void eat( FILE *in, char expected ) {
 symbol read_symbol( FILE *in ) {
     int c, i = 0;
     symbol s = new_symbol();
-    ppp( "New symbol" );
-    c = getc( in );
 
-    while ( is_symbolic( c ) ) {
-        s[ i ] = c;
-        i++;
-        c = getc( in );
-    }
-
+    while ( is_symbolic( c = getc( in ) ) ) s[ i++ ] = c;
     s[ i ] = '\0';
-    ppp( "Populated symbol" );
-    ppp( s );
+    ungetc( c, in );
 
     return s;
 }
