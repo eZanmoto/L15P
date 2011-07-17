@@ -19,3 +19,5 @@ void init();
 extern list *empty_list;
 
 bool is_null( list *l );
+
+void error( char *s );

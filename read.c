@@ -5,7 +5,7 @@
 #include "read.h"
 
 void error( char *message ) {
-    fprintf( stderr, "[!] %s\n", message );
+    fprintf( stderr, "[!] Error: %s\n", message );
     exit( 1 );
 }
 

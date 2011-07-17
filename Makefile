@@ -4,6 +4,7 @@ CF=$(CC) $(CFLAGS)
 CO=$(CF) -c
 TARGET=l15p
 OBJS=l15p.o read.o print.o eval.o
+BINDIR=/usr/local/bin
 
 cleanbuild: clean all
 
@@ -22,5 +23,11 @@ print.o:
 eval.o:
 	$(CO) eval.c
 
+install:
+	cp $(TARGET) $(BINDIR)/$(TARGET)
+
 clean:
 	rm -rf $(OBJS) $(TARGET)
+
+distclean: clean
+	rm -rf $(BINDIR)/$(TARGET)

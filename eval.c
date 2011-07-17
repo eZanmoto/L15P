@@ -9,10 +9,12 @@ bool car_is( list *l, char *string ) {
 }
 
 list *eval( list *l ) {
-    list *eval;
+    list *eval = l;
 
     if ( car_is( l, "quote" ) ) {
         eval = l->cdr;
+        if ( is_null( eval ) )
+            error( "'quote' expects exactly one argument" );
     } else if ( car_is( l, "cdr" ) ) {
         eval = l->cdr->cdr;
     }
