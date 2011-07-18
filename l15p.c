@@ -1,4 +1,6 @@
 #include <stdio.h>
+
+#include "types.h"
 #include "read.h"
 #include "eval.h"
 #include "print.h"

@@ -1,22 +1,34 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "types.h"
 #include "read.h"
 #include "eval.h"
+#include "util.h"
 
-bool car_is( list *l, char *string ) {
-    return strcmp( l->car, string ) == 0;
+/*
+ * Returns 'true' if the list 'l' is the function 'function'.
+ * \param l checks if this function is 'function'
+ * \param function checks if 'l' is this function
+ * \return 'true' if the list 'l' is the function 'function'
+ */
+bool is_function( list *l, symbol function ) {
+    return strcmp( l->car, function ) == 0;
 }
 
+/*
+ * Evaluates the list 'l'
+ * \param l the list to evaluate
+ * \return the value of 'l'
+ */
 list *eval( list *l ) {
     list *eval = l;
 
-    if ( car_is( l, "quote" ) ) {
-        eval = l->cdr;
-        if ( is_null( eval ) )
+    if ( is_function( l, "quote" ) ) {
+        if ( is_null( eval = l->cdr ) )
             error( "'quote' expects exactly one argument" );
-    } else if ( car_is( l, "cdr" ) ) {
-        eval = l->cdr->cdr;
+    } else {
+        printf( "*** Didn't get 'quote'" );
     }
 
     return eval;
