@@ -9,10 +9,10 @@ void error( char *message ) {
     exit( 1 );
 }
 
-list *empty_list;
+list *EMPTY_LIST;
 
 bool is_null( list *l ) {
-    return empty_list == l;
+    return EMPTY_LIST == l;
 }
 
 symbol new_symbol() {
@@ -29,7 +29,7 @@ list *new_list() {
 }
 
 void init() {
-    empty_list = new_list();
+    EMPTY_LIST = new_list();
 }
 
 bool in_chars( char c, char *cs ) {
@@ -86,12 +86,16 @@ list *read_list( FILE *in ) {
     c = getc( in );
 
     if ( ')' == c ) {
-        l = empty_list;
+        l = EMPTY_LIST;
     } else {
         ungetc( c, in );
         l->car = read_symbol( in );
-        l->cdr = read_list( in );
-        eat( in, ')' );
+        if ( ')' ) {
+            l->cdr = EMPTY_LIST;
+        } else {
+            l->cdr = read_list( in );
+            eat( in, ')' );
+        }
     }
 
     return l;

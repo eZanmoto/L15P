@@ -16,7 +16,7 @@ list *read( FILE *in );
 
 void init();
 
-extern list *empty_list;
+extern list *EMPTY_LIST;
 
 bool is_null( list *l );
 
