@@ -53,11 +53,11 @@ bool is_symbolic( int c ) {
  */
 void eat_whitespace( FILE *in ) {
     int c;
-    printd( "Eating whitespace" );
+    output( 2, ">Eating whitespace" );
     do {
         c = getc( in );
     } while( c != EOF && is_white( c ) );
-    printd( "Finished eating whitespace" );
+    output( 2, "<Eating whitespace" );
     ungetc( c, in );
 }
 
@@ -88,14 +88,16 @@ object *read_object( FILE *in ) {
     c = getc( in );
 
     if ( '(' == c ) {
-        printd( "Reading list" );
+        output( 2, ">>Reading list" );
         o->type = LIST;
         o->data.l = read_list( in );
+        output( 2, "<<Reading list" );
     } else {
-        printd( "Reading symbol" );
+        output( 2, ">>Reading symbol" );
         ungetc( c, in );
         o->type = SYMBOL;
         o->data.s = read_symbol( in );
+        output( 2, "<<Reading symbol" );
     }
 
     return o;
@@ -109,11 +111,12 @@ symbol read_symbol( FILE *in ) {
     int c, i = 0;
     symbol s = new_symbol();
 
-    eat_whitespace( in );
+    output( 1, ">>>Reading symbol" );
 
     while ( is_symbolic( c = getc( in ) ) ) s[ i++ ] = c;
     s[ i ] = '\0';
     ungetc( c, in );
+    output( 1, "<<<Reading symbol" );
 
     return s;
 }
@@ -138,25 +141,46 @@ list *objects_to_list( object **os, int size ) {
  * \param in the buffer to read the next list from
  */
 list *read_list( FILE *in ) {
-    int c, i;
+    int c, i = 0;
     list *l = new_list();
     object *os[ MAX_OBJECTS ];
 
     eat_whitespace( in );
 
     if ( ( c = getc( in ) ) == ')' ) {
-        printd( "Read empty list" );
+        output( 1, ">>>Read empty list" );
         l = EMPTY_LIST;
+        output( 1, "<<<Read empty list" );
     } else {
-        printd( "Read regular list" );
+        ungetc( c, in );
+        output( 1, ">>>Read regular list" );
+        output( 4, ">>>>[1]Read object" );
         l->car = read_object( in );
-        for ( i = 0; ( c == getc( in ) ) == ')'; i++ ) {
+        output( 4, "<<<<[1]Read object" );
+        while ( ( c = getc( in ) ) != ')' ) {
             ungetc( c, in );
-            os[ i ] = read_object( in );
             eat_whitespace( in );
+            output( 4, ">>>>[2]Read object" );
+            os[ i ] = read_object( in );
+            output( 4, "<<<<[2]Read object" );
+            i++;
         }
+        output( 4, ">>>>Fill in empty list" );
+        os[ i ] = new_object();
+        output( 5, ">>>>>[1]Fill in empty list" );
+        os[ i ]->type = LIST;
+        output( 5, ">>>>>[2]Fill in empty list" );
+        os[ i ]->data.l = new_list();
+        output( 5, ">>>>>[3]Fill in empty list" );
+        os[ i ]->data.l->car = NULL;
+        output( 5, ">>>>>[4]Fill in empty list" );
+        os[ i ]->data.l->cdr = EMPTY_LIST;
+        output( 5, ">>>>>[5]Fill in empty list" );
         l->cdr = objects_to_list( os, i );
+        output( 4, "<<<<Fill in empty list" );
+        output( 1, "<<<Read regular list" );
     }
+    output( 1, "<<<Read regular list" );
 
     return l;
 }
@@ -166,7 +190,7 @@ list *read_list( FILE *in ) {
  * \param the buffer to read the next list from
  */
 object *read( FILE *in ) {
-    printd( "Reading object" );
+    output( 3, ">Reading object" );
     return read_object( in );
-    printd( "Finished reading object" );
+    output( 3, "<Reading object" );
 }

@@ -10,27 +10,27 @@ void print_object( object *o );
 void print_list( list *l ) {
     printf( "(" );
     if ( ! is_null( l ) ) {
-        printd( "Printing regular list" );
+        output( 1, "Printing regular list" );
         print_object( l->car );
         print_list( l->cdr );
     } else {
-        printd( "Printing empty list" );
+        output( 1, "Printing empty list" );
     }
     printf( ")" );
 }
 
 void print_object( object *o ) {
     if ( o->type == SYMBOL ) {
-        printd( "Printing symbol" );
+        output( 2, "Printing symbol" );
         printf( "%s", o->data.s );
     } else {
-        printd( "Printing list" );
+        output( 2, "Printing list" );
         print_list( o->data.l );
     }
 }
 
 void print( object *o ) {
-    printd( "Printing object" );
+    output( 3, "Printing object" );
     print_object( o );
-    printd( "Finished printing object" );
+    output( 3, "Finished printing object" );
 }

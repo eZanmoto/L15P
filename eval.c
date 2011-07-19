@@ -22,12 +22,17 @@ bool is_function( list *l, symbol function ) {
     return strcmp( l->car->data.s, function ) == 0;
 }
 
+int length( list *l ) {
+    return is_null( l->cdr ) ? 0 : 1 + length( l->cdr );
+}
+
 int num_args( list *l ) {
-    return is_null( l->cdr ) ? 0 : 1 + num_args( l->cdr );
+    return length( l ) - 1;
 }
 
 object *quote( object *o ) {
     object *result;
+    // printf( "*** 'quote' has [%d] arguments\n", num_args( o->data.l ) );
     if ( num_args( o->data.l ) == 1 ) {
         result = o->data.l->cdr->car;
     } else {
@@ -51,6 +56,8 @@ object *eval_object( object *o ) {
             eval = o;
         } else if ( is_function( o->data.l, "quote" ) ) {
             o = quote( o );
+        } else {
+            error( "Unrecognized function" );
         }
     } else {
         printd( "Read symbol" );
