@@ -55,7 +55,7 @@ object *eval_object( object *o ) {
             printd( "Read empty list" );
             eval = o;
         } else if ( is_function( o->data.l, "quote" ) ) {
-            o = quote( o );
+            eval = quote( o );
         } else {
             error( "Unrecognized function" );
         }
