@@ -9,7 +9,7 @@
  */
 symbol new_symbol() {
     symbol s = malloc( sizeof( char ) * MAX_SYMBOL_LEN );
-    if ( NULL == s ) error( "Out of memory: allocating symbol" );
+    if ( NULL == s ) fatal( "Out of memory: allocating symbol" );
     s[ 0 ] = '\0';
     return s;
 }
@@ -25,7 +25,7 @@ void init_types() {
 
 object *new_object() {
     object *o = malloc( sizeof( object ) );
-    if ( NULL == o ) error( "Out of memory: allocating object" );
+    if ( NULL == o ) fatal( "Out of memory: allocating object" );
     return o;
 }
 
@@ -43,7 +43,7 @@ bool is_list( object *o ) {
  */
 list *new_list() {
     list *l = malloc( sizeof( list ) );
-    if ( NULL == l ) error( "Out of memory: allocating list" );
+    if ( NULL == l ) fatal( "Out of memory: allocating list" );
     l->car = new_object();
     return l;
 }
