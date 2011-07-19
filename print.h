@@ -1,1 +1,1 @@
-void print( list *l );
+void print( object *l );

@@ -6,27 +6,7 @@
 #include "types.h"
 #include "read.h"
 #include "util.h"
-
-/*
- * Represents the empty list.
- */
-list *EMPTY_LIST;
-
-/*
- * Returns 'true' if 'l' is the empty list.
- * \param l the list to check
- * \return 'true' if 'l' is the empty list
- */
-bool is_null( list *l ) {
-    return EMPTY_LIST == l;
-}
-
-/*
- * Initializes constants.
- */
-void init() {
-    EMPTY_LIST = new_list();
-}
+#include "debug.h"
 
 /*
  * Returns 'true' if 'c' is in 'cs'.
@@ -73,9 +53,11 @@ bool is_symbolic( int c ) {
  */
 void eat_whitespace( FILE *in ) {
     int c;
+    printd( "*** [read.c] Eating whitespace" );
     do {
         c = getc( in );
     } while( c != EOF && is_white( c ) );
+    printd( "*** [read.c] Finished eating whitespace" );
     ungetc( c, in );
 }
 
@@ -92,6 +74,33 @@ void match( FILE *in, char expected ) {
     }
 }
 
+list *read_list( FILE *in );
+symbol read_symbol( FILE *in );
+
+/*
+ * Reads the next object from 'in'.
+ */
+object *read_object( FILE *in ) {
+    int c;
+    object *o = new_object();
+
+    eat_whitespace( in );
+    c = getc( in );
+
+    if ( '(' == c ) {
+        printd( "*** Reading list" );
+        o->type = LIST;
+        o->data.l = read_list( in );
+    } else {
+        printd( "*** Reading symbol" );
+        ungetc( c, in );
+        o->type = SYMBOL;
+        o->data.s = read_symbol( in );
+    }
+
+    return o;
+}
+
 /*
  * Reads the next symbol from 'in'.
  * \param in the buffer to read the next symbol from
@@ -100,39 +109,55 @@ symbol read_symbol( FILE *in ) {
     int c, i = 0;
     symbol s = new_symbol();
 
+    eat_whitespace( in );
+
     while ( is_symbolic( c = getc( in ) ) ) s[ i++ ] = c;
     s[ i ] = '\0';
     ungetc( c, in );
 
-    eat_whitespace( in );
-
     return s;
 }
+
+/*
+ * Converts the array 'os' to a list
+ * \param os the array to convert to a list
+ * \param size the size of the list
+ * \return a list holding the elements of 'os'
+ */
+list *objects_to_list( object **os, int size ) {
+    list *l = new_list();
+    l->car = *os;
+    l->cdr = 0 == size ? EMPTY_LIST : objects_to_list( ++os, --size );
+    return l;
+}
+
+#define MAX_OBJECTS 32
 
 /*
  * Reads the next list from 'in'.
  * \param in the buffer to read the next list from
  */
 list *read_list( FILE *in ) {
-    int c;
+    int c, i;
     list *l = new_list();
+    object *os[ MAX_OBJECTS ];
 
+    printd( "*** [read.c] Reading list" );
     eat_whitespace( in );
-    match( in, '(' );
-    c = getc( in );
+    printd( "*** [read.c] Reading list" );
 
-    if ( ')' == c ) {
+    if ( ( c = getc( in ) ) == ')' ) {
+        printd( "*** [read.c] Read empty list" );
         l = EMPTY_LIST;
     } else {
-        ungetc( c, in );
-
-        l->car = read_symbol( in );
-        if ( ')' ) {
-            l->cdr = EMPTY_LIST;
-        } else {
-            l->cdr = read_list( in );
-            match( in, ')' );
+        printd( "*** [read.c] Read regular list" );
+        l->car = read_object( in );
+        for ( i = 0; ( c == getc( in ) ) == ')'; i++ ) {
+            ungetc( c, in );
+            os[ i ] = read_object( in );
+            eat_whitespace( in );
         }
+        l->cdr = objects_to_list( os, i );
     }
 
     return l;
@@ -142,6 +167,8 @@ list *read_list( FILE *in ) {
  * Reads a list from the buffer 'in'.
  * \param the buffer to read the next list from
  */
-list *read( FILE *in ) {
-    return read_list( in );
+object *read( FILE *in ) {
+    printd( "*** [read.c] Reading object" );
+    return read_object( in );
+    printd( "*** [read.c] Finished reading object" );
 }

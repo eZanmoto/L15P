@@ -1,1 +1,1 @@
-list *eval( list *l );
+object *eval( object *l );
