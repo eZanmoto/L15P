@@ -1,2 +1,2 @@
-#define debug       1
-#define printd(s)   if ( debug ) { printf( "%s\n", s ); }
+#define debug       0
+#define printd(s)   if ( debug ) { printf( "*** [%s] %s\n", __FILE__, s ); }

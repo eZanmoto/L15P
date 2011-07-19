@@ -53,11 +53,11 @@ bool is_symbolic( int c ) {
  */
 void eat_whitespace( FILE *in ) {
     int c;
-    printd( "*** [read.c] Eating whitespace" );
+    printd( "Eating whitespace" );
     do {
         c = getc( in );
     } while( c != EOF && is_white( c ) );
-    printd( "*** [read.c] Finished eating whitespace" );
+    printd( "Finished eating whitespace" );
     ungetc( c, in );
 }
 
@@ -88,11 +88,11 @@ object *read_object( FILE *in ) {
     c = getc( in );
 
     if ( '(' == c ) {
-        printd( "*** Reading list" );
+        printd( "Reading list" );
         o->type = LIST;
         o->data.l = read_list( in );
     } else {
-        printd( "*** Reading symbol" );
+        printd( "Reading symbol" );
         ungetc( c, in );
         o->type = SYMBOL;
         o->data.s = read_symbol( in );
@@ -142,15 +142,13 @@ list *read_list( FILE *in ) {
     list *l = new_list();
     object *os[ MAX_OBJECTS ];
 
-    printd( "*** [read.c] Reading list" );
     eat_whitespace( in );
-    printd( "*** [read.c] Reading list" );
 
     if ( ( c = getc( in ) ) == ')' ) {
-        printd( "*** [read.c] Read empty list" );
+        printd( "Read empty list" );
         l = EMPTY_LIST;
     } else {
-        printd( "*** [read.c] Read regular list" );
+        printd( "Read regular list" );
         l->car = read_object( in );
         for ( i = 0; ( c == getc( in ) ) == ')'; i++ ) {
             ungetc( c, in );
@@ -168,7 +166,7 @@ list *read_list( FILE *in ) {
  * \param the buffer to read the next list from
  */
 object *read( FILE *in ) {
-    printd( "*** [read.c] Reading object" );
+    printd( "Reading object" );
     return read_object( in );
-    printd( "*** [read.c] Finished reading object" );
+    printd( "Finished reading object" );
 }

@@ -6,6 +6,7 @@
 #include "read.h"
 #include "eval.h"
 #include "util.h"
+#include "debug.h"
 
 bool streq( char *a, char *b ) {
     return strcmp( a, b ) == 0;
@@ -44,14 +45,15 @@ object *eval_object( object *o ) {
     object *eval = o;
 
     if ( LIST == o->type ) {
-        printf( "*** Read list" );
+        printd( "Read list" );
         if ( is_null( o->data.l ) ) {
-            printf( "*** Read empty list" );
+            printd( "Read empty list" );
             eval = o;
         } else if ( is_function( o->data.l, "quote" ) ) {
             o = quote( o );
         }
     } else {
+        printd( "Read symbol" );
         if ( streq( o->data.s, "quit" ) ) {
             printf( "\nGoodbye." );
             exit( 0 );
@@ -63,5 +65,7 @@ object *eval_object( object *o ) {
 }
 
 object *eval( object *o ) {
+    printd( "Evaluating symbol" );
     return eval_object( o );
+    printd( "Finished evaluating symbol" );
 }
