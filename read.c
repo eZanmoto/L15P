@@ -183,19 +183,7 @@ list *read_list( FILE *in ) {
             output( 4, "<<<<[2]Read object" );
             i++;
         }
-        output( 4, ">>>>Fill in empty list" );
-        os[ i ] = new_object();
-        output( 5, ">>>>>[1]Fill in empty list" );
-        os[ i ]->type = LIST;
-        output( 5, ">>>>>[2]Fill in empty list" );
-        os[ i ]->data.l = new_list();
-        output( 5, ">>>>>[3]Fill in empty list" );
-        os[ i ]->data.l->car = NULL;
-        output( 5, ">>>>>[4]Fill in empty list" );
-        os[ i ]->data.l->cdr = EMPTY_LIST;
-        output( 5, ">>>>>[5]Fill in empty list" );
         l->cdr = objects_to_list( os, i );
-        output( 4, "<<<<Fill in empty list" );
         output( 1, "<<<Read regular list" );
     }
     output( 1, "<<<Read regular list" );
