@@ -40,7 +40,7 @@ void print_list( list *l ) {
 void print_object( object *o ) {
     if ( o->type == SYMBOL ) {
         output( 2, "Printing symbol" );
-        printf( "%s", o->data.s );
+        printf( " %s ", o->data.s );
     } else {
         output( 2, "Printing list" );
         print_list( o->data.l );

@@ -47,6 +47,20 @@ object *new_object() {
     return o;
 }
 
+object *new_symbol_object() {
+    object *o = new_object();
+    o->type = SYMBOL;
+    o->data.s = new_symbol();
+    return o;
+}
+
+object *new_list_object() {
+    object *o = new_object();
+    o->type = LIST;
+    o->data.l = EMPTY_LIST;
+    return o;
+}
+
 bool is_symbol( object *o ) {
     return SYMBOL == o->type;
 }
@@ -62,7 +76,8 @@ bool is_list( object *o ) {
 list *new_list() {
     list *l = malloc( sizeof( list ) );
     if ( NULL == l ) fatal( "Out of memory: allocating list" );
-    l->car = new_object();
+    l->car = new_symbol_object();
+    l->cdr = EMPTY_LIST;
     return l;
 }
 

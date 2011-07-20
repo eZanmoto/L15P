@@ -50,6 +50,10 @@ void init_types();
 
 object *new_object();
 
+object *new_symbol_object();
+
+object *new_list_object();
+
 bool is_symbol( object *o );
 
 bool is_list( object *o );
