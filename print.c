@@ -27,7 +27,6 @@
 void print_object( object * );
 
 void print_list( list *l ) {
-    printf( "(" );
     if ( ! is_null( l ) ) {
         output( 1, "Printing regular list" );
         print_object( l->car );
@@ -35,7 +34,6 @@ void print_list( list *l ) {
     } else {
         output( 1, "Printing empty list" );
     }
-    printf( ")" );
 }
 
 void print_object( object *o ) {
@@ -44,7 +42,9 @@ void print_object( object *o ) {
         printf( " %s ", o->data.s );
     } else {
         output( 2, "Printing list" );
+        printf( "(" );
         print_list( o->data.l );
+        printf( ")" );
     }
 }
 

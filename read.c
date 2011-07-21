@@ -136,12 +136,14 @@ symbol read_symbol( FILE *in ) {
     int c, i = 0;
     symbol s = new_symbol();
 
+    eat_whitespace( in );
     output( 1, ">>>Reading symbol" );
 
     while ( is_symbolic( c = getc( in ) ) ) s[ i++ ] = c;
     s[ i ] = '\0';
     ungetc( c, in );
     output( 1, "<<<Reading symbol" );
+    // printf( "Read symbol [%s]\n", s );
 
     return s;
 }
