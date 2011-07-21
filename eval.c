@@ -200,6 +200,55 @@ object *cdr( object *o ) {
     return result;
 }
 
+object *eval_cond( list *l ) {
+    object *result;
+    bool is_true = false;
+
+    if ( is_null( l ) ) {
+        result = new_list_object();
+    } else {
+        object *test = eval_object( l->car );
+
+        if ( LIST == test->type ) {
+            list *l = test->data.l;
+            if ( length( l ) == 2 ) {
+                object *p = eval_object( l->car );
+                object *e = l->cdr->car;
+
+                if ( ! ( LIST == p->type && is_null( p->data.l ) ) ) {
+                    is_true = true;
+                    result = eval_object( e );
+                }
+            } else {
+                error( "List arguments to 'cond' must be have two elements" );
+                result = new_list_object();
+            }
+        } else {
+            error( "Arguments to 'cond' must be lists" );
+            result = new_list_object();
+        }
+
+        if ( ! is_true ) {
+            result = eval_cond( l->cdr );
+        }
+    }
+
+    return result;
+}
+
+object *cond ( object *o ) {
+    object *result;
+
+    if ( num_args( o->data.l ) >= 1 ) {
+        result = eval_cond( o->data.l );
+    } else {
+        error( "'cond' expects at least one argument" );
+        result = o;
+    }
+
+    return result;
+}
+
 object *bool_to_object( bool b ) {
     return b ? true_object() : new_list_object();
 }
@@ -231,6 +280,8 @@ object *eval_object( object *o ) {
             eval = car( o );
         } else if ( is_function( l, "cdr" ) ) {
             eval = cdr( o );
+        } else if ( is_function( l, "cond" ) ) {
+            eval = cond( o );
         } else {
             error( "Unrecognized function" );
         }
@@ -239,9 +290,10 @@ object *eval_object( object *o ) {
         if ( streq( o->data.s, "quit" ) ) {
             printf( "\nGoodbye." );
             exit( 0 );
+        } else {
+            error( "Naked symbol" );
+            eval = o;
         }
-        error( "Naked symbol" );
-        eval = o;
     }
 
     return eval;
