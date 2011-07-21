@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "types.h"
+
 void error( char *message ) {
     fprintf( stderr, "[!] Error: %s\n", message );
 }
@@ -26,4 +28,8 @@ void error( char *message ) {
 void fatal( char *message ) {
     fprintf( stderr, "!!! Fatal: %s\n", message );
     exit( 1 );
+}
+
+int length( list *l ) {
+    return is_null( l ) ? 0 : 1 + length( l->cdr );
 }

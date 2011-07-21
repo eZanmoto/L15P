@@ -115,6 +115,7 @@ object *read_object( FILE *in ) {
         match( in, '(' );
         o = new_list_object();
         o->data.l = read_list( in );
+        // printf( "Size of read list is [%d]\n", length( o->data.l ) );
         match( in, ')' );
         output( 2, "<<Reading list" );
     } else {
@@ -157,14 +158,14 @@ list *read_list( FILE *in ) {
 
     if ( peek( in ) == ')' ) {
         output( 1, ">>>Read empty list" );
-        printf( "List length is [%d]\n", i );
+        // printf( "List length is [%d]\n", i );
         l = EMPTY_LIST;
         output( 1, "<<<Read empty list" );
     } else {
         output( 1, ">>>Read regular list" );
         l = new_list();
         l->car = read_object( in );
-        printf( "List length is now [%d]\n", i++ );
+        // printf( "List length is now [%d]\n", i++ );
         l->cdr = read_list( in );
         output( 1, "<<<Read regular list" );
     }
