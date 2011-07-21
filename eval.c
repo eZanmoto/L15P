@@ -50,7 +50,7 @@ int num_args( list *l ) {
 
 object *quote( object *o ) {
     object *result = new_symbol_object();
-    // printf( "*** 'quote' has [%d] arguments\n", num_args( o->data.l ) );
+    printf( "*** 'quote' has [%d] arguments\n", num_args( o->data.l ) );
     if ( num_args( o->data.l ) == 1 ) {
         result = o->data.l->cdr->car;
     } else {

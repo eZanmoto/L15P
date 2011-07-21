@@ -92,6 +92,13 @@ void match( FILE *in, char expected ) {
     }
 }
 
+int peek( FILE *in ) {
+    int c = getc( in );
+    ungetc( c, in );
+    return c;
+}
+
+object *read_object( FILE *in );
 list *read_list( FILE *in );
 symbol read_symbol( FILE *in );
 
@@ -99,21 +106,20 @@ symbol read_symbol( FILE *in );
  * Reads the next object from 'in'.
  */
 object *read_object( FILE *in ) {
-    int c;
-    object *o = new_object();
+    object *o;
 
     eat_whitespace( in );
-    c = getc( in );
 
-    if ( '(' == c ) {
+    if ( peek( in ) == '(' ) {
         output( 2, ">>Reading list" );
-        o->type = LIST;
+        match( in, '(' );
+        o = new_list_object();
         o->data.l = read_list( in );
+        match( in, ')' );
         output( 2, "<<Reading list" );
     } else {
         output( 2, ">>Reading symbol" );
-        ungetc( c, in );
-        o->type = SYMBOL;
+        o = new_symbol_object();
         o->data.s = read_symbol( in );
         output( 2, "<<Reading symbol" );
     }
@@ -140,53 +146,29 @@ symbol read_symbol( FILE *in ) {
 }
 
 /*
- * Converts the array 'os' to a list
- * \param os the array to convert to a list
- * \param size the size of the list
- * \return a list holding the elements of 'os'
- */
-list *objects_to_list( object **os, int size ) {
-    list *l = new_list();
-    l->car = *os;
-    l->cdr = 0 == size ? EMPTY_LIST : objects_to_list( ++os, --size );
-    return l;
-}
-
-#define MAX_OBJECTS 32
-
-/*
  * Reads the next list from 'in'.
  * \param in the buffer to read the next list from
  */
 list *read_list( FILE *in ) {
-    int c, i = 0;
-    list *l = new_list();
-    object *os[ MAX_OBJECTS ];
+    static int i = 0;
+    list *l;
 
     eat_whitespace( in );
 
-    if ( ( c = getc( in ) ) == ')' ) {
+    if ( peek( in ) == ')' ) {
         output( 1, ">>>Read empty list" );
+        printf( "List length is [%d]\n", i );
         l = EMPTY_LIST;
         output( 1, "<<<Read empty list" );
     } else {
-        ungetc( c, in );
         output( 1, ">>>Read regular list" );
-        output( 4, ">>>>[1]Read object" );
+        l = new_list();
         l->car = read_object( in );
-        output( 4, "<<<<[1]Read object" );
-        while ( ( c = getc( in ) ) != ')' ) {
-            ungetc( c, in );
-            eat_whitespace( in );
-            output( 4, ">>>>[2]Read object" );
-            os[ i ] = read_object( in );
-            output( 4, "<<<<[2]Read object" );
-            i++;
-        }
-        l->cdr = objects_to_list( os, i );
+        printf( "List length is now [%d]\n", i++ );
+        l->cdr = read_list( in );
         output( 1, "<<<Read regular list" );
     }
-    output( 1, "<<<Read regular list" );
+    i = 0;
 
     return l;
 }

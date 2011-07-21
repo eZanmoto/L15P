@@ -1,7 +1,5 @@
-object      ::= symbol | list
+object      ::= symbol | '(' list ')'
 
 symbol      ::= [a-zA-Z0-9]+
 
-list        ::= '(' object+ ')' | empty_list
-
-empty_list  ::= '()'
+list        ::= object list | e

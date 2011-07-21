@@ -17,13 +17,14 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "types.h"
 #include "read.h"
 #include "print.h"
 #include "debug.h"
 
-void print_object( object *o );
+void print_object( object * );
 
 void print_list( list *l ) {
     printf( "(" );
@@ -50,5 +51,6 @@ void print_object( object *o ) {
 void print( object *o ) {
     output( 3, "Printing object" );
     print_object( o );
+    free( o );
     output( 3, "Finished printing object" );
 }
