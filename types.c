@@ -33,11 +33,20 @@ symbol new_symbol() {
 }
 
 /*
+ * Represents truth.
+ */
+symbol TRUE;
+
+/*
  * Represents the empty list.
  */
 list *EMPTY_LIST;
 
 void init_types() {
+    TRUE = new_symbol();
+    TRUE[ 0 ] = 't';
+    TRUE[ 1 ] = '\0';
+
     EMPTY_LIST = new_list();
 }
 

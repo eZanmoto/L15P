@@ -27,10 +27,11 @@
  * Outputs the splash text for L15P
  */
 void output_splash() {
-    printf( "L15P\n" );
-    printf( "An interpretive LISP environment.\n" );
-    printf( "Written by Sean Kelleher.\n" );
-    printf( "ctrl+C to Exit\n" );
+    printf( "L15P  Copyright (C) 2011  Sean Kelleher\n" );
+    printf( "This program comes with ABSOLUTELY NO WARRANTY.\n" );
+    printf( "This is free software, and you are welcome to redistribute it\n" );
+    printf( "under certain conditions.\n" );
+    printf( "Type 'quit' to exit.\n" );
 }
 
 /*

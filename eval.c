@@ -44,13 +44,35 @@ int num_args( list *l ) {
     return length( l ) - 1;
 }
 
+object *eval_object( object *o );
+
 object *quote( object *o ) {
-    object *result = new_symbol_object();
+    object *result;
     // printf( "*** 'quote' has [%d] arguments\n", num_args( o->data.l ) );
     if ( num_args( o->data.l ) == 1 ) {
         result = o->data.l->cdr->car;
     } else {
         error( "'quote' expects exactly one argument" );
+    }
+    return result;
+}
+
+bool is_atomic( object *o ) {
+    // Short circuiting stops this throwing a type error
+    return SYMBOL == o->type || is_null( o->data.l );
+}
+
+object *atom( object *o ) {
+    object *result;
+    if ( num_args( o->data.l ) == 1 ) {
+        if ( is_atomic( eval_object( o->data.l->cdr->car ) ) ) {
+            result = new_symbol_object();
+            result->data.s = TRUE;
+        } else {
+            result = new_list_object();
+        }
+    } else {
+        error( "'atom' expects exactly one argument" );
     }
     return result;
 }
@@ -65,11 +87,15 @@ object *eval_object( object *o ) {
 
     if ( LIST == o->type ) {
         printd( "Read list" );
-        if ( is_null( o->data.l ) ) {
+        list *l = o->data.l;
+
+        if ( is_null( l ) ) {
             printd( "Read empty list" );
             eval = o;
-        } else if ( is_function( o->data.l, "quote" ) ) {
+        } else if ( is_function( l, "quote" ) ) {
             eval = quote( o );
+        } else if ( is_function( l, "atom" ) ) {
+            eval = atom( o );
         } else {
             error( "Unrecognized function" );
         }

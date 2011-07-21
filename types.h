@@ -27,6 +27,8 @@ typedef char *symbol;
 
 symbol new_symbol();
 
+extern symbol TRUE;
+
 typedef enum { SYMBOL, LIST } object_type;
 
 typedef struct object {

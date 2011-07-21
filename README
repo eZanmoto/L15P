@@ -22,4 +22,8 @@
 
         l15p
         
-       To exit, use ctrl+C.))))
+       To exit, type quit:
+       
+        >>> quit
+        
+       ))))
