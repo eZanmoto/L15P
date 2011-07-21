@@ -58,15 +58,15 @@ object *quote( object *o ) {
     return result;
 }
 
-bool is_atomic( object *o ) {
-    // Short circuiting stops this throwing a type error
-    return SYMBOL == o->type || is_null( o->data.l );
-}
-
 object *true_object() {
     object *t = new_symbol_object();
     t->data.s = TRUE;
     return t;
+}
+
+bool is_atomic( object *o ) {
+    // Short circuiting stops this throwing a type error
+    return SYMBOL == o->type || is_null( o->data.l );
 }
 
 bool atom( object *o ) {
@@ -79,7 +79,20 @@ bool atom( object *o ) {
     return result;
 }
 
+bool eq_list( list *a, list *b );
 bool eq_object( object *, object * );
+
+bool eq( object *o ) {
+    bool result = false;
+    if ( num_args( o->data.l ) == 2 ) {
+        object *a = eval_object( second( o ) );
+        object *b = eval_object( third( o ) );
+        result = eq_object( a, b );
+    } else {
+        error( "'eq' expects exactly two arguments" );
+    }
+    return result;
+}
 
 bool eq_list( list *a, list *b ) {
     bool eq = eq_object( a->car, b->car );
@@ -105,18 +118,6 @@ bool eq_object( object *a, object *b ) {
         }
     }
     return eq;
-}
-
-bool eq( object *o ) {
-    bool result = false;
-    if ( num_args( o->data.l ) == 2 ) {
-        object *a = eval_object( second( o ) );
-        object *b = eval_object( third( o ) );
-        result = eq_object( a, b );
-    } else {
-        error( "'eq' expects exactly two arguments" );
-    }
-    return result;
 }
 
 object *cons( object *o ) {
@@ -172,6 +173,33 @@ object *car( object *o ) {
     return result;
 }
 
+object *cdr( object *o ) {
+    object *result;
+
+    if ( num_args( o->data.l ) == 1 ) {
+        result = eval_object( second( o ) );
+        if ( result->type == LIST ) {
+            if ( !is_null( result->data.l ) ) {
+                list *l = result->data.l->cdr;
+
+                result = new_object();
+                result->type = LIST;
+                result->data.l = l;
+            } else {
+                error( "The empty list doesn't have a 'cdr'" );
+            }
+        } else {
+            error( "The argument to 'cdr' should be a list" );
+            result = new_list_object();
+        }
+    } else {
+        error( "'cdr' expects exactly one argument" );
+        result = o;
+    }
+
+    return result;
+}
+
 object *bool_to_object( bool b ) {
     return b ? true_object() : new_list_object();
 }
@@ -201,6 +229,8 @@ object *eval_object( object *o ) {
             eval = cons( o );
         } else if ( is_function( l, "car" ) ) {
             eval = car( o );
+        } else if ( is_function( l, "cdr" ) ) {
+            eval = cdr( o );
         } else {
             error( "Unrecognized function" );
         }
