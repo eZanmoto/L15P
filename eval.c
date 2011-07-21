@@ -62,19 +62,64 @@ bool is_atomic( object *o ) {
     return SYMBOL == o->type || is_null( o->data.l );
 }
 
-object *atom( object *o ) {
-    object *result;
+object *true_object() {
+    object *t = new_symbol_object();
+    t->data.s = TRUE;
+    return t;
+}
+
+bool atom( object *o ) {
+    bool atom;
     if ( num_args( o->data.l ) == 1 ) {
-        if ( is_atomic( eval_object( o->data.l->cdr->car ) ) ) {
-            result = new_symbol_object();
-            result->data.s = TRUE;
-        } else {
-            result = new_list_object();
-        }
+         atom = is_atomic( eval_object( o->data.l->cdr->car ) );
     } else {
         error( "'atom' expects exactly one argument" );
     }
+    return atom;
+}
+
+bool eq_object( object *, object * );
+
+bool eq_list( list *a, list *b ) {
+    bool eq = eq_object( a->car, b->car );
+
+    if ( is_null( a ) && is_null( b ) ) {
+        eq &= true;
+    } else if ( is_null( a ) || is_null( b ) ) {
+        eq = false;
+    } else {
+        eq &= eq_list( a->cdr, b->cdr );
+    }
+
+    return eq;
+}
+
+bool eq_object( object *a, object *b ) {
+    bool eq = false;
+    if ( a->type == b->type ) {
+        if ( SYMBOL == a->type ) {
+            eq = strcmp( a->data.s, b->data.s ) == 0;
+        } else {
+            eq = eq_list( a->data.l, b->data.l );
+        }
+    }
+    return eq;
+}
+
+bool eq( object *o ) {
+    bool result = false;
+    if ( num_args( o->data.l ) == 2 ) {
+        object *a = eval_object( second( o ) );
+        object *b = eval_object( third( o ) );
+        result = eq_object( a, b );
+    } else {
+        error( "'eq' expects exactly two arguments" );
+    }
     return result;
+}
+
+object *bool_to_object( bool b ) {
+    return b ? true_object() : new_list_object();
 }
 
 /*
@@ -95,7 +140,9 @@ object *eval_object( object *o ) {
         } else if ( is_function( l, "quote" ) ) {
             eval = quote( o );
         } else if ( is_function( l, "atom" ) ) {
-            eval = atom( o );
+            eval = bool_to_object( atom( o ) );
+        } else if ( is_function( l, "eq" ) ) {
+            eval = bool_to_object( eq( o ) );
         } else {
             error( "Unrecognized function" );
         }

@@ -16,7 +16,11 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-void error( char *message );
-void fatal( char *message );
+void error( char * );
+void fatal( char * );
 
-int length( list *l );
+int length( list * );
+
+object *head( object * );
+object *second( object * );
+object *third( object * );

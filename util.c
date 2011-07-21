@@ -33,3 +33,15 @@ void fatal( char *message ) {
 int length( list *l ) {
     return is_null( l ) ? 0 : 1 + length( l->cdr );
 }
+
+object *head( object *o ) {
+    return o->data.l->car;
+}
+
+object *second( object *o ) {
+    return o->data.l->cdr->car;
+}
+
+object *third( object *o ) {
+    return o->data.l->cdr->cdr->car;
+}
