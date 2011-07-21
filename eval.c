@@ -149,6 +149,29 @@ object *cons( object *o ) {
     return result;
 }
 
+object *car( object *o ) {
+    object *result;
+
+    if ( num_args( o->data.l ) == 1 ) {
+        result = eval_object( second( o ) );
+        if ( result->type == LIST ) {
+            if ( !is_null( result->data.l ) ) {
+                result = result->data.l->car;
+            } else {
+                error( "The empty list doesn't have a 'car'" );
+            }
+        } else {
+            error( "The argument to 'car' should be a list" );
+            result = new_list_object();
+        }
+    } else {
+        error( "'car' expects exactly one argument" );
+        result = o;
+    }
+
+    return result;
+}
+
 object *bool_to_object( bool b ) {
     return b ? true_object() : new_list_object();
 }
@@ -176,6 +199,8 @@ object *eval_object( object *o ) {
             eval = bool_to_object( eq( o ) );
         } else if ( is_function( l, "cons" ) ) {
             eval = cons( o );
+        } else if ( is_function( l, "car" ) ) {
+            eval = car( o );
         } else {
             error( "Unrecognized function" );
         }
