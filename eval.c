@@ -53,6 +53,7 @@ object *quote( object *o ) {
         result = o->data.l->cdr->car;
     } else {
         error( "'quote' expects exactly one argument" );
+        result = o;
     }
     return result;
 }
@@ -69,13 +70,13 @@ object *true_object() {
 }
 
 bool atom( object *o ) {
-    bool atom;
+    bool result = false;
     if ( num_args( o->data.l ) == 1 ) {
-         atom = is_atomic( eval_object( o->data.l->cdr->car ) );
+         result = is_atomic( eval_object( o->data.l->cdr->car ) );
     } else {
         error( "'atom' expects exactly one argument" );
     }
-    return atom;
+    return result;
 }
 
 bool eq_object( object *, object * );
@@ -118,6 +119,36 @@ bool eq( object *o ) {
     return result;
 }
 
+object *cons( object *o ) {
+    object *result;
+    if ( num_args( o->data.l ) == 2 ) {
+        output( 2, ">Evaluating cons" );
+        result = new_object();
+        result->type = LIST;
+        result->data.l = new_list();
+        output( 3, ">>Evaluating head" );
+        object *secondParameter = eval_object( second( o ) );
+        output( 3, "<<Evaluating head" );
+        output( 3, ">>>Populating head" );
+        result->data.l->car = secondParameter;
+        output( 3, "<<<Populating head" );
+        output( 3, ">>Evaluating tail" );
+        object *thirdParameter = eval_object( third( o ) );
+        if ( thirdParameter->type == LIST ) {
+            output( 3, ">>Populating tail" );
+            result->data.l->cdr = thirdParameter->data.l;
+        } else {
+            error( "The second argument to 'cons' should be a list" );
+            output( 3, ">>Tail is empty" );
+            result->data.l->cdr = EMPTY_LIST;
+        }
+    } else {
+        error( "'cons' expects exactly two arguments" );
+        result = o;
+    }
+    return result;
+}
+
 object *bool_to_object( bool b ) {
     return b ? true_object() : new_list_object();
 }
@@ -143,6 +174,8 @@ object *eval_object( object *o ) {
             eval = bool_to_object( atom( o ) );
         } else if ( is_function( l, "eq" ) ) {
             eval = bool_to_object( eq( o ) );
+        } else if ( is_function( l, "cons" ) ) {
+            eval = cons( o );
         } else {
             error( "Unrecognized function" );
         }
@@ -152,6 +185,7 @@ object *eval_object( object *o ) {
             printf( "\nGoodbye." );
             exit( 0 );
         }
+        error( "Naked symbol" );
         eval = o;
     }
 
