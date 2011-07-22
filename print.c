@@ -51,6 +51,5 @@ void print_object( object *o ) {
 void print( object *o ) {
     output( 3, "Printing object" );
     print_object( o );
-    free( o );
     output( 3, "Finished printing object" );
 }

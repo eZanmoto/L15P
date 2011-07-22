@@ -24,6 +24,7 @@
 #include "read.h"
 #include "eval.h"
 #include "util.h"
+#include "print.h"
 #include "debug.h"
 
 bool streq( char *a, char *b ) {
@@ -200,38 +201,82 @@ object *cdr( object *o ) {
     return result;
 }
 
+bool eval_cond_test( object *o ) {
+    bool result = true;
+
+    if ( LIST == o->type ) {
+        output( 3, ">>>Evaluating test" );
+        object *eval = eval_object( o );
+        output( 3, "<<<Evaluating test" );
+
+        result = ! ( LIST == eval->type && is_null( eval->data.l ) );
+
+        // free( eval );
+    }
+
+    return result;
+}
+
+object *eval_cond_pair( list *l ) {
+    object *result;
+
+    if ( length( l ) == 2 ) {
+        if ( eval_cond_test( l->car ) ) {
+            output( 2, ">>Test was true, evaluating rest" );
+            result = eval_object( l->cdr->car );
+            // printf( "*** Result: " );
+            // print( result );
+            // printf( "\n*** Car: " );
+            // print( l->car );
+            // printf( "\n" );
+            output( 2, ">>Test was true, evaluating rest" );
+        } else {
+            output( 2, ">>Test was false" );
+            result = new_list_object();
+            output( 2, "<<Test was false" );
+        }
+    } else {
+        error( "List arguments to 'cond' must be have two elements" );
+        result = new_list_object();
+    }
+
+    printf( "\n*** 'eval_list' returning: " );
+    print( result );
+    printf( "\n" );
+
+    return result;
+}
+
 object *eval_cond( list *l ) {
     object *result;
-    bool is_true = false;
 
     if ( is_null( l ) ) {
         result = new_list_object();
     } else {
-        object *test = eval_object( l->car );
+        output( 2, ">>Evaluating list argument" );
+        object *eval = eval_object( l->car );
+        output( 2, "<<Evaluating list argument" );
 
-        if ( LIST == test->type ) {
-            list *l = test->data.l;
-            if ( length( l ) == 2 ) {
-                object *p = eval_object( l->car );
-                object *e = l->cdr->car;
-
-                if ( ! ( LIST == p->type && is_null( p->data.l ) ) ) {
-                    is_true = true;
-                    result = eval_object( e );
-                }
-            } else {
-                error( "List arguments to 'cond' must be have two elements" );
-                result = new_list_object();
+        if ( LIST == eval->type ) {
+            output( 3, ">>>Evaluating pair" )
+            result = eval_cond_pair( eval->data.l );
+            output( 3, "<<<Evaluating pair" )
+            if ( LIST == result->type && is_null( result->data.l ) ) {
+                output( 2, ">>Evaluating next argument" );
+                result = eval_cond( l->cdr );
+                output( 2, "<<Evaluating next argument" );
             }
         } else {
             error( "Arguments to 'cond' must be lists" );
             result = new_list_object();
         }
 
-        if ( ! is_true ) {
-            result = eval_cond( l->cdr );
-        }
+        // free( eval );
     }
+
+    printf( "\n*** 'eval_cond' returning: " );
+    print( result );
+    printf( "\n" );
 
     return result;
 }
@@ -240,7 +285,7 @@ object *cond ( object *o ) {
     object *result;
 
     if ( num_args( o->data.l ) >= 1 ) {
-        result = eval_cond( o->data.l );
+        result = eval_cond( o->data.l->cdr );
     } else {
         error( "'cond' expects at least one argument" );
         result = o;
@@ -292,6 +337,7 @@ object *eval_object( object *o ) {
             exit( 0 );
         } else {
             error( "Naked symbol" );
+            // printf( "[!] Symbol [%s]\n", o->data.s );
             eval = o;
         }
     }
@@ -300,7 +346,8 @@ object *eval_object( object *o ) {
 }
 
 object *eval( object *o ) {
-    printd( "Evaluating symbol" );
-    return eval_object( o );
-    printd( "Finished evaluating symbol" );
+    printd( "Evaluating object" );
+    o = eval_object( o );
+    printd( "Finished evaluating object" );
+    return o;
 }
