@@ -70,14 +70,6 @@ object *new_list_object() {
     return o;
 }
 
-bool is_symbol( object *o ) {
-    return SYMBOL == o->type;
-}
-
-bool is_list( object *o ) {
-    return LIST == o->type;
-}
-
 /*
  * Returns a new list.
  * \return a new list
@@ -88,6 +80,27 @@ list *new_list() {
     l->car = new_symbol_object();
     l->cdr = EMPTY_LIST;
     return l;
+}
+
+object *new_function_object() {
+    object *o = new_object();
+    o->type = FUNCTION;
+    return o;
+}
+
+object *new_parameter_object() {
+    object *o = new_object();
+    o->type = PARAMETER;
+    o->data.p = -1;
+    return o;
+}
+
+bool is_symbol( object *o ) {
+    return SYMBOL == o->type;
+}
+
+bool is_list( object *o ) {
+    return LIST == o->type;
 }
 
 bool is_null( list *l ) {

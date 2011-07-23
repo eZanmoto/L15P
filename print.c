@@ -23,6 +23,7 @@
 #include "read.h"
 #include "print.h"
 #include "debug.h"
+#include "util.h"
 
 void print_object( object * );
 
@@ -37,14 +38,19 @@ void print_list( list *l ) {
 }
 
 void print_object( object *o ) {
-    if ( o->type == SYMBOL ) {
+    if ( SYMBOL == o->type ) {
         output( 2, "Printing symbol" );
         printf( " %s ", o->data.s );
-    } else {
+    } else if ( LIST == o->type ) {
         output( 2, "Printing list" );
-        printf( "(" );
+        printf( " (" );
         print_list( o->data.l );
         printf( ")" );
+    } else if ( FUNCTION == o->type ) {
+        printf( " FUNCTION[0x%08x]", o );
+    } else {
+        error( "Unknown object" );
+        printf( "Type ID: %d", o->type );
     }
 }
 

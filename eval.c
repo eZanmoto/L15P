@@ -38,7 +38,7 @@ bool streq( char *a, char *b ) {
  * \return 'true' if the list 'l' is the function 'function'
  */
 bool is_function( list *l, symbol function ) {
-    return strcmp( l->car->data.s, function ) == 0;
+    return streq( l->car->data.s, function );
 }
 
 int num_args( list *l ) {
@@ -281,7 +281,7 @@ object *eval_cond( list *l ) {
     return result;
 }
 
-object *cond ( object *o ) {
+object *cond( object *o ) {
     object *result;
 
     if ( num_args( o->data.l ) >= 1 ) {
@@ -294,20 +294,111 @@ object *cond ( object *o ) {
     return result;
 }
 
+int pindex( symbol pname, list *plist, int cur_index ) {
+    int index = -1;
+
+    if ( ! is_null( plist ) ) {
+        if ( SYMBOL == plist->car->type ) {
+            output( 3, ">>>Checking head" );
+            bool found = streq( plist->car->data.s, pname );
+            output( 3, "<<<Checking head" );
+            if ( found ) {
+                index = cur_index;
+            } else {
+                output( 3, ">>>Checking tail" );
+                index = pindex( pname, plist->cdr, cur_index + 1 );
+                output( 3, "<<<Checking tail" );
+            }
+        } else {
+            error( "Parameter list may only contain symbols" );
+        }
+    } else {
+        output( 1, "*** Symbol isn't parameter" );
+        // printf( "*** Parameter [%s]\n", pname );
+    }
+
+    return index;
+}
+
+int parameter_index( symbol pname, list *plist ) {
+    return pindex( pname, plist, 0 );
+}
+
+list *expr_list( list *param_list, list *expr ) {
+
+    if ( ! is_null( expr ) ) {
+        if ( SYMBOL == expr->car->type ) {
+            output( 3, ">>>Checking for parameter" );
+            int i = parameter_index( expr->car->data.s, param_list );
+            if ( i >= 0 ) {
+                expr->car = new_parameter_object();
+                expr->car->data.p = i;
+            }
+            output( 3, "<<<Checking for parameter" );
+        } else if ( LIST == expr->car->type ) {
+            expr->car->data.l = expr_list( param_list, expr->car->data.l );
+        }
+        expr->cdr = expr_list( param_list, expr->cdr );
+    } else {
+        output( 3, "*** Finished evaluating lambda list" );
+    }
+
+    return expr;
+}
+
+/*
+ * Traverse the expression tree 'expr' and replace all symbols that occur in
+ * 'param_list' with a parameter number.
+ */
+object *new_funct( list *param_list, object *expr ) {
+    object *funct = new_function_object();
+
+    if ( LIST == expr->type ) {
+        output( 2, ">>Evaluating lambda list" );
+        funct->data.l = expr_list( param_list, expr->data.l );
+        output( 2, "<<Evaluating lambda list" );
+    } else {
+        error( "The expression to 'lambda' must be a list" );
+        funct->data.l = EMPTY_LIST;
+    }
+
+    return funct;
+}
+
+object *lambda( object *o ) {
+    object *funct;
+
+    if ( num_args( o->data.l ) == 2 ) {
+        object *temp = second( o );
+
+        if ( LIST == temp->type ) {
+            list *param_list = temp->data.l;
+            object *expr = third( o );
+            output( 1, ">Evaluating lambda" );
+            funct = new_funct( param_list, expr );
+            output( 1, "<Evaluating lambda" );
+        } else {
+            error( "The first parameter to 'lambda' must be a list" );
+            funct = new_list_object();
+        }
+    } else {
+        error( "'lambda' expects exactly two parameters" );
+        funct = new_list_object();
+    }
+
+    return funct;
+}
+
 object *bool_to_object( bool b ) {
     return b ? true_object() : new_list_object();
 }
 
-/*
- * Evaluates the list 'l'.
- * \param l the list to evaluate
- * \return the value of 'l'
- */
-object *eval_object( object *o ) {
+object *_eval_object( object *o, bool is_head ) {
     object *eval = o;
 
     if ( LIST == o->type ) {
         printd( "Read list" );
+        o->data.l->car = _eval_object( o->data.l->car, true );
         list *l = o->data.l;
 
         if ( is_null( l ) ) {
@@ -327,22 +418,30 @@ object *eval_object( object *o ) {
             eval = cdr( o );
         } else if ( is_function( l, "cond" ) ) {
             eval = cond( o );
+        } else if ( is_function( l, "lambda" ) ) {
+            eval = lambda( o );
         } else {
             error( "Unrecognized function" );
         }
+    } else if ( FUNCTION == o->type ) {
+        eval = o;
     } else {
         printd( "Read symbol" );
         if ( streq( o->data.s, "quit" ) ) {
             printf( "\nGoodbye." );
             exit( 0 );
-        } else {
-            error( "Naked symbol" );
+        } else if ( ! is_head ) {
+            warning( "Naked symbol" );
             // printf( "[!] Symbol [%s]\n", o->data.s );
             eval = o;
         }
     }
 
     return eval;
+}
+
+object *eval_object( object *o ) {
+    return _eval_object( o, false );
 }
 
 object *eval( object *o ) {

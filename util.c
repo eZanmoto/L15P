@@ -21,6 +21,10 @@
 
 #include "types.h"
 
+void warning( char *message ) {
+    fprintf( stderr, "[!] Warning: %s\n", message );
+}
+
 void error( char *message ) {
     fprintf( stderr, "[!] Error: %s\n", message );
 }

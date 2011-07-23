@@ -29,13 +29,14 @@ symbol new_symbol();
 
 extern symbol TRUE;
 
-typedef enum { SYMBOL, LIST } object_type;
+typedef enum { SYMBOL, LIST, FUNCTION, PARAMETER } object_type;
 
 typedef struct object {
     object_type type;
     union {
         symbol s;
         struct list *l;
+        int p;
     } data;
 } object;
 
@@ -55,6 +56,10 @@ object *new_object();
 object *new_symbol_object();
 
 object *new_list_object();
+
+object *new_function_object();
+
+object *new_parameter_object();
 
 bool is_symbol( object *o );
 

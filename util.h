@@ -16,6 +16,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+void warning( char * );
 void error( char * );
 void fatal( char * );
 
