@@ -29,7 +29,7 @@ print.o:
 eval.o:
 	$(CO) eval.c
 
-install:
+install: all
 	cp $(TARGET) $(BINDIR)/$(TARGET)
 
 clean:

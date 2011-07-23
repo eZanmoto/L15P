@@ -463,7 +463,7 @@ object *label( object *o ) {
                 FunctionName[ NumFunctions ] = name;
                 output( 3, "<<<Assigning new name" );
                 output( 3, ">>>Assigning new function" );
-                Function[ NumFunctions++ ] = result;
+                Function[ NumFunctions++ ] = funct;
                 output( 3, "<<<Assigning new function" );
             } else {
                 error( "The second argument to 'label' must be a function" );
@@ -481,6 +481,17 @@ object *label( object *o ) {
     return result;
 }
 
+int function_index( list *l ) {
+    int i;
+    bool found;
+    output( 2, ">>Looking for function" );
+    for ( i = 0; i < NumFunctions && ! found; i++ ) {
+        found = streq( l->car->data.s, FunctionName[ i ] );
+    }
+    output( 2, "<<Looking for function" );
+    return ( found ? i : 0 ) - 1;
+}
+
 object *_eval_object( object *o, bool is_head ) {
     object *eval = o;
 
@@ -488,6 +499,7 @@ object *_eval_object( object *o, bool is_head ) {
         printd( "Read list" );
         o->data.l->car = _eval_object( o->data.l->car, true );
         list *l = o->data.l;
+        int findex;
 
         if ( is_null( l ) ) {
             printd( "Read empty list" );
@@ -511,9 +523,19 @@ object *_eval_object( object *o, bool is_head ) {
         } else if ( is_function( l, "cond" ) ) {
             eval = cond( o );
         } else if ( is_function( l, "lambda" ) ) {
+            // TODO: evaluate parameter list
             eval = lambda( o );
         } else if ( is_function( l, "label" ) ) {
+            // TODO: evaluate parameter list
             eval = label( o );
+        } else if ( ( findex = function_index( l ) ) >= 0 ) {
+            // TODO: evaluate parameter list
+            output( 1, ">Executing labelled function" );
+            // printf( "findex: %d\n", findex );
+            // print( Function[ findex ] );
+            object *funct = eval_funct( o->data.l->cdr, Function[ findex ] );
+            eval = eval_object( funct );
+            output( 1, "<Executing labelled function" );
         } else {
             error( "Unrecognized function" );
         }
