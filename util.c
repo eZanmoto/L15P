@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "types.h"
 
@@ -34,18 +35,29 @@ void fatal( char *message ) {
     exit( 1 );
 }
 
+bool streq( char *a, char *b ) {
+    return strcmp( a, b ) == 0;
+}
+
+void verify_list( object *o ) {
+    if ( o->type != LIST ) fatal( "Object is not a list" );
+}
+
 int length( list *l ) {
     return is_null( l ) ? 0 : 1 + length( l->cdr );
 }
 
-object *head( object *o ) {
+object *first( object *o ) {
+    verify_list( o );
     return o->data.l->car;
 }
 
 object *second( object *o ) {
+    verify_list( o );
     return o->data.l->cdr->car;
 }
 
 object *third( object *o ) {
+    verify_list( o );
     return o->data.l->cdr->cdr->car;
 }

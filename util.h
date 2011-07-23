@@ -20,8 +20,10 @@ void warning( char * );
 void error( char * );
 void fatal( char * );
 
+bool streq( char *, char * );
+
 int length( list * );
 
-object *head( object * );
+object *first( object * );
 object *second( object * );
 object *third( object * );

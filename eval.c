@@ -27,10 +27,6 @@
 #include "print.h"
 #include "debug.h"
 
-bool streq( char *a, char *b ) {
-    return strcmp( a, b ) == 0;
-}
-
 /*
  * Returns 'true' if the list 'l' is the function 'function'.
  * \param l checks if this function is 'function'
@@ -431,6 +427,7 @@ list *funct_list( list *param_list, list *funct ) {
 object *eval_funct( list *param_list, object *funct ) {
     object *expr = new_object();
     expr->type   = LIST;
+    // TODO: evaluate param_list
     expr->data.l = funct_list( param_list, funct->data.l );
     return expr;
 }
@@ -523,13 +520,10 @@ object *_eval_object( object *o, bool is_head ) {
         } else if ( is_function( l, "cond" ) ) {
             eval = cond( o );
         } else if ( is_function( l, "lambda" ) ) {
-            // TODO: evaluate parameter list
             eval = lambda( o );
         } else if ( is_function( l, "label" ) ) {
-            // TODO: evaluate parameter list
             eval = label( o );
         } else if ( ( findex = function_index( l ) ) >= 0 ) {
-            // TODO: evaluate parameter list
             output( 1, ">Executing labelled function" );
             // printf( "findex: %d\n", findex );
             // print( Function[ findex ] );
