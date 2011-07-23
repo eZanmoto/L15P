@@ -16,4 +16,6 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+void init_eval();
+
 object *eval( object *l );

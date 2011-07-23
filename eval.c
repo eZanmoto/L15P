@@ -435,6 +435,52 @@ object *eval_funct( list *param_list, object *funct ) {
     return expr;
 }
 
+#define MAX_FUNCTIONS 256
+
+symbol *FunctionName;
+object **Function;
+int NumFunctions;
+
+void init_eval() {
+    FunctionName = malloc( sizeof( symbol ) * MAX_FUNCTIONS );
+    Function = malloc( sizeof( object* ) * MAX_FUNCTIONS );
+    NumFunctions = 0;
+}
+
+object *label( object *o ) {
+    object *result;
+
+    if ( num_args( o->data.l ) == 2 ) {
+        result = second( o );
+        if ( SYMBOL == result->type ) {
+
+            symbol name = result->data.s;
+            output( 3, "*** Got function name" );
+            object *funct = eval_object( third( o ) );
+            output( 3, "*** Got function" );
+            if ( FUNCTION == funct->type ) {
+                output( 3, ">>>Assigning new name" );
+                FunctionName[ NumFunctions ] = name;
+                output( 3, "<<<Assigning new name" );
+                output( 3, ">>>Assigning new function" );
+                Function[ NumFunctions++ ] = result;
+                output( 3, "<<<Assigning new function" );
+            } else {
+                error( "The second argument to 'label' must be a function" );
+                result = new_list_object();
+            }
+        } else {
+            error( "The first argument to 'label' must be a symbol" );
+            result = new_list_object();
+        }
+    } else {
+        error( "'label' expects exactly two arguments" );
+        result = o;
+    }
+
+    return result;
+}
+
 object *_eval_object( object *o, bool is_head ) {
     object *eval = o;
 
@@ -466,6 +512,8 @@ object *_eval_object( object *o, bool is_head ) {
             eval = cond( o );
         } else if ( is_function( l, "lambda" ) ) {
             eval = lambda( o );
+        } else if ( is_function( l, "label" ) ) {
+            eval = label( o );
         } else {
             error( "Unrecognized function" );
         }

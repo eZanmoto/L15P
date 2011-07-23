@@ -51,6 +51,7 @@ void repl() {
 int main() {
     output_splash();
     init_types();
+    init_eval();
     repl();
     return 0;
 }
