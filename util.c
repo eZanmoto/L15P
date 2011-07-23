@@ -39,6 +39,11 @@ bool streq( char *a, char *b ) {
     return strcmp( a, b ) == 0;
 }
 
+bool is_atomic( object *o ) {
+    return SYMBOL == o->type
+        || ( LIST == o->type && is_null( o->data.l ) );
+}
+
 void verify_list( object *o ) {
     if ( o->type != LIST ) fatal( "Object is not a list" );
 }

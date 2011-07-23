@@ -22,6 +22,8 @@ void fatal( char * );
 
 bool streq( char *, char * );
 
+bool is_atomic( object * );
+
 int length( list * );
 
 object *first( object * );

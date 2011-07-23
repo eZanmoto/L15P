@@ -61,11 +61,6 @@ object *true_object() {
     return t;
 }
 
-bool is_atomic( object *o ) {
-    // Short circuiting stops this throwing a type error
-    return SYMBOL == o->type || is_null( o->data.l );
-}
-
 bool atom( object *o ) {
     bool result = false;
     if ( num_args( o->data.l ) == 1 ) {
