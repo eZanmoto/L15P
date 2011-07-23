@@ -495,6 +495,7 @@ object *_eval_object( object *o, bool is_head ) {
 
         if ( is_null( l ) ) {
             printd( "Read empty list" );
+            warning( "Naked symbol" );
             eval = o;
         } else if ( FUNCTION == o->data.l->car->type ) {
             object *expr = eval_funct( o->data.l->cdr, o->data.l->car );
@@ -522,8 +523,11 @@ object *_eval_object( object *o, bool is_head ) {
             output( 1, ">Executing labelled function" );
             // printf( "findex: %d\n", findex );
             // print( Function[ findex ] );
-            object *funct = eval_funct( o->data.l->cdr, Function[ findex ] );
-            eval = eval_object( funct );
+            output( 2, ">>Copying object" );
+            object *funct = copy_object( Function[ findex ] );
+            output( 2, "<<Copying object" );
+            object *expr = eval_funct( o->data.l->cdr, funct );
+            eval = eval_object( expr );
             output( 1, "<Executing labelled function" );
         } else {
             error( "Unrecognized function" );

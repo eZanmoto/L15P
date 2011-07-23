@@ -22,7 +22,11 @@ void fatal( char * );
 
 bool streq( char *, char * );
 
+object *copy_object( object * );
+
 bool is_atomic( object * );
+
+list *copy_list( list * );
 
 int length( list * );
 
