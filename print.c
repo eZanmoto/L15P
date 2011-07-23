@@ -47,7 +47,8 @@ void print_object( object *o ) {
         print_list( o->data.l );
         printf( ")" );
     } else if ( FUNCTION == o->type ) {
-        printf( " FUNCTION[0x%08x]", o );
+        // printf( " FUNCTION[0x%08x]", o );
+        printf( " FUNCTION" );
     } else {
         error( "Unknown object" );
         printf( "Type ID: %d", o->type );

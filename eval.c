@@ -428,7 +428,7 @@ object *_eval_object( object *o, bool is_head ) {
     } else {
         printd( "Read symbol" );
         if ( streq( o->data.s, "quit" ) ) {
-            printf( "\nGoodbye." );
+            printf( "\nGoodbye.\n" );
             exit( 0 );
         } else if ( ! is_head ) {
             warning( "Naked symbol" );
