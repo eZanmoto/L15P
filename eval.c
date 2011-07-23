@@ -393,6 +393,48 @@ object *bool_to_object( bool b ) {
     return b ? true_object() : new_list_object();
 }
 
+object *param_with_index( int index, list *param_list ) {
+    object *param;
+
+    if ( is_null( param_list ) ) {
+        error( "Parameter index out of bounds" );
+        param = new_list_object();
+    } else {
+        if ( 0 == index ) {
+            param = param_list->car;
+        } else {
+            param = param_with_index( index - 1, param_list->cdr );
+        }
+    }
+
+    return param;
+}
+
+list *funct_list( list *param_list, list *funct ) {
+
+    if ( ! is_null( funct ) ) {
+        if ( PARAMETER == funct->car->type ) {
+            funct->car = param_with_index( funct->car->data.p, param_list );
+        } else if ( LIST == funct->car->type ) {
+            funct->car->data.l = funct_list( param_list, funct->car->data.l );
+        }
+        funct->cdr = funct_list( param_list, funct->cdr );
+    }
+
+    return funct;
+}
+
+/*
+ * Traverse the expression tree 'funct' and replace all parameter numbers with
+ * their correspondant from 'param_list'.
+ */
+object *eval_funct( list *param_list, object *funct ) {
+    object *expr = new_object();
+    expr->type   = LIST;
+    expr->data.l = funct_list( param_list, funct->data.l );
+    return expr;
+}
+
 object *_eval_object( object *o, bool is_head ) {
     object *eval = o;
 
@@ -404,6 +446,10 @@ object *_eval_object( object *o, bool is_head ) {
         if ( is_null( l ) ) {
             printd( "Read empty list" );
             eval = o;
+        } else if ( FUNCTION == o->data.l->car->type ) {
+            object *expr = eval_funct( o->data.l->cdr, o->data.l->car );
+            eval = eval_object( expr );
+            free( expr );
         } else if ( is_function( l, "quote" ) ) {
             eval = quote( o );
         } else if ( is_function( l, "atom" ) ) {
