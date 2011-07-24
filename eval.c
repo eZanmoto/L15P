@@ -231,9 +231,9 @@ object *eval_cond_pair( list *l ) {
         result = new_list_object();
     }
 
-    printf( "\n*** 'eval_list' returning: " );
-    print( result );
-    printf( "\n" );
+    // printf( "\n*** 'eval_list' returning: " );
+    // print( result );
+    // printf( "\n" );
 
     return result;
 }
@@ -244,9 +244,7 @@ object *eval_cond( list *l ) {
     if ( is_null( l ) ) {
         result = new_list_object();
     } else {
-        output( 2, ">>Evaluating list argument" );
-        object *eval = eval_object( l->car );
-        output( 2, "<<Evaluating list argument" );
+        object *eval = l->car;
 
         if ( LIST == eval->type ) {
             output( 3, ">>>Evaluating pair" )
@@ -265,9 +263,9 @@ object *eval_cond( list *l ) {
         // free( eval );
     }
 
-    printf( "\n*** 'eval_cond' returning: " );
-    print( result );
-    printf( "\n" );
+    // printf( "\n*** 'eval_cond' returning: " );
+    // print( result );
+    // printf( "\n" );
 
     return result;
 }
