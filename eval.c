@@ -208,32 +208,14 @@ bool eval_cond_test( object *o ) {
     return result;
 }
 
-object *eval_cond_pair( list *l ) {
-    object *result;
+bool eval_cond_pair( list *l ) {
+    bool result = false;
 
     if ( length( l ) == 2 ) {
-        if ( eval_cond_test( l->car ) ) {
-            output( 2, ">>Test was true, evaluating rest" );
-            result = eval_object( l->cdr->car );
-            // printf( "*** Result: " );
-            // print( result );
-            // printf( "\n*** Car: " );
-            // print( l->car );
-            // printf( "\n" );
-            output( 2, ">>Test was true, evaluating rest" );
-        } else {
-            output( 2, ">>Test was false" );
-            result = new_list_object();
-            output( 2, "<<Test was false" );
-        }
+        result = eval_cond_test( l->car );
     } else {
         error( "List arguments to 'cond' must be have two elements" );
-        result = new_list_object();
     }
-
-    // printf( "\n*** 'eval_list' returning: " );
-    // print( result );
-    // printf( "\n" );
 
     return result;
 }
@@ -247,10 +229,10 @@ object *eval_cond( list *l ) {
         object *eval = l->car;
 
         if ( LIST == eval->type ) {
-            output( 3, ">>>Evaluating pair" )
-            result = eval_cond_pair( eval->data.l );
-            output( 3, "<<<Evaluating pair" )
-            if ( LIST == result->type && is_null( result->data.l ) ) {
+            output( 3, "*** Evaluating pair" )
+            if ( eval_cond_pair( eval->data.l ) ) {
+                result = eval_object( eval->data.l->cdr->car );
+            } else {
                 output( 2, ">>Evaluating next argument" );
                 result = eval_cond( l->cdr );
                 output( 2, "<<Evaluating next argument" );
