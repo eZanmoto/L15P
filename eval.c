@@ -511,6 +511,7 @@ object *_eval_object( object *o, bool is_head ) {
             output( 1, "<Executing labelled function" );
         } else {
             error( "Unrecognized function" );
+            printf( "*** Function [%s]\n", l->car->data.s );
         }
     } else if ( FUNCTION == o->type ) {
         eval = o;

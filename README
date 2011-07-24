@@ -17,13 +17,19 @@
        which will build the source and install the executable in the standard
        directory.)
 
-    (Running)
-      (To run, use:
+      (Running
+        (To run, use:
 
-        l15p
+          l15p
         
-       To exit, type quit:
+         To exit, type quit:
        
-        >>> quit
-        
-       ))))
+          >>> quit)))
+
+    (Examples
+        (You can find example code in the 'lisp.lisp' file. This can be
+         copy/pasted into the running L15P interpreter. The aim of the script is
+         to create a functioning LISP interpreter written in LISP, and to run it
+         within the L15P environment. Most of the code is taken from Paul
+         Graham's paper, 'The Roots of Lisp':
+            http://lib.store.yahoo.net/lib/paulgraham/jmc.ps))))
