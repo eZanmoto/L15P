@@ -118,6 +118,10 @@ object *read_object( FILE *in ) {
         // printf( "Size of read list is [%d]\n", length( o->data.l ) );
         match( in, ')' );
         output( 2, "<<Reading list" );
+    } else if ( peek( in ) == ')' ) {
+        warning( "Extraneous left paren" );
+        match( in, ')' );
+        o = read_object( in );
     } else {
         output( 2, ">>Reading symbol" );
         o = new_symbol_object();
